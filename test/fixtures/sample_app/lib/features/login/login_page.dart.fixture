@@ -1,0 +1,16 @@
+import 'package:flutter/material.dart';
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('Welcome back'),
+        const TextField(decoration: InputDecoration(hintText: 'Email')),
+        Container(color: const Color(0xFF123456)),
+      ],
+    );
+  }
+}

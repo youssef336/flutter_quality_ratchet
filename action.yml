@@ -1,0 +1,78 @@
+name: Flutter Quality Ratchet
+description: >-
+  Fail the pull request on new lint debt in a Dart or Flutter project, while
+  the frozen old debt may only shrink.
+author: youssef336
+branding:
+  icon: trending-down
+  color: blue
+
+inputs:
+  working-directory:
+    description: Project root (the folder with quality_ratchet.yaml).
+    required: false
+    default: .
+  base-ref:
+    description: >-
+      Ref the raise guard compares with. Empty, or a bare "origin/" on push
+      events, runs without --base.
+    required: false
+    default: origin/${{ github.base_ref }}
+  version:
+    description: >-
+      Git ref of flutter_quality_ratchet to run. Empty uses the copy of the
+      action itself (the ref in `uses:`).
+    required: false
+    default: ''
+  sdk:
+    description: Dart SDK channel or version for dart-lang/setup-dart.
+    required: false
+    default: stable
+
+runs:
+  using: composite
+  steps:
+    - uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.sdk }}
+
+    - name: Activate quality_ratchet
+      shell: bash
+      env:
+        TOOL_VERSION: ${{ inputs.version }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        if [ -n "$TOOL_VERSION" ]; then
+          dart pub global activate --source git \
+            https://github.com/youssef336/flutter_quality_ratchet --git-ref "$TOOL_VERSION"
+        else
+          dart pub global activate --source path "$ACTION_PATH"
+        fi
+
+    - name: Fetch the base branch
+      if: ${{ inputs.base-ref != '' && inputs.base-ref != 'origin/' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BASE_REF: ${{ inputs.base-ref }}
+      run: |
+        # The raise guard needs the merge-base. Fetch the base branch when the
+        # checkout does not have it (best effort; fetch-depth: 0 is simplest).
+        if [[ "$BASE_REF" == origin/* ]] && ! git rev-parse --verify --quiet "$BASE_REF" >/dev/null; then
+          git fetch --no-tags origin "+refs/heads/${BASE_REF#origin/}:refs/remotes/$BASE_REF" || true
+        fi
+        if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+          git fetch --no-tags --unshallow origin || true
+        fi
+
+    - name: quality_ratchet check
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BASE_REF: ${{ inputs.base-ref }}
+      run: |
+        args=(check --format github)
+        if [ -n "$BASE_REF" ] && [ "$BASE_REF" != "origin/" ]; then
+          args+=(--base "$BASE_REF")
+        fi
+        dart pub global run flutter_quality_ratchet:quality_ratchet "${args[@]}"

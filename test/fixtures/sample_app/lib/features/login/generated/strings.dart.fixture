@@ -1,0 +1,2 @@
+// Generated: never scanned.
+void hello() => print('generated');

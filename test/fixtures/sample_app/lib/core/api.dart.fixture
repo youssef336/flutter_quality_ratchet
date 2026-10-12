@@ -1,0 +1,4 @@
+import 'package:sample_app/features/login/login_state.dart';
+
+// The core layer reaching into a feature: frozen debt.
+LoginState initialState() => LoginState();
