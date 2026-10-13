@@ -14,7 +14,7 @@ import 'init_template.dart';
 import 'project.dart';
 
 /// Package version, printed by `--version`.
-const String packageVersion = '0.1.0';
+const String packageVersion = '0.1.1';
 
 const String _commands = '''
 Commands:

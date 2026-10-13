@@ -2,7 +2,7 @@ name: flutter_quality_ratchet
 description: >-
   A quality ratchet for Dart and Flutter projects: freeze today's lint debt in a
   baseline that may only shrink, and fail CI on every new violation.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/youssef336/flutter_quality_ratchet
 issue_tracker: https://github.com/youssef336/flutter_quality_ratchet/issues
 topics:

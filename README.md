@@ -1,3 +1,5 @@
+[العربية](README.ar.md)
+
 <h1 align="center">Flutter Quality Ratchet</h1>
 
 <p align="center">
@@ -5,6 +7,7 @@
 </p>
 
 <p align="center">
+  <a href="https://pub.dev/packages/flutter_quality_ratchet"><img src="https://img.shields.io/pub/v/flutter_quality_ratchet?style=for-the-badge&logo=dart&label=pub.dev" alt="pub.dev"/></a>
   <a href="https://github.com/youssef336/flutter_quality_ratchet/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/youssef336/flutter_quality_ratchet/test.yml?branch=main&style=for-the-badge&label=tests" alt="Tests"></a>
   <img src="https://img.shields.io/badge/Dart-%5E3.9-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
   <img src="https://img.shields.io/badge/Flutter-ready-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
@@ -26,61 +29,49 @@
 > human text, GitHub annotations or JSON; exit codes are 0 clean, 1 violations, 2 usage/config
 > error. Ships with a composite GitHub Action: `uses: youssef336/flutter_quality_ratchet@v1`.
 
-<div dir="rtl">
+You have a Flutter project with hundreds of `print` calls, hand-written colors and files that went
+past a thousand lines, and you want to start enforcing stricter rules today, without stopping work
+for a month to clean everything up? That is exactly what this tool does.
 
-عندك مشروع Flutter فيه مئات الـ `print` والألوان المكتوبة بإيدك والفايلات اللي عدّت الألف سطر،
-وعايز تبدأ تشدّد القواعد من النهارده، من غير ما توقف الشغل شهر عشان تنضف كل حاجة؟
-ده بالظبط اللي الأداة دي بتعمله.
+## 🪜 The idea: the "ratchet"
 
-## 🪜 الفكرة: «الـ ratchet»
+A ratchet is a gear that turns in one direction only. Here that direction is **down**:
 
-الـ ratchet هو الترس اللي بيلف في اتجاه واحد بس. هنا الاتجاه ده هو **لتحت**:
+- 🧊 **Old debt is frozen**: the first time you run `init`, the tool counts the violations in every
+  file and writes them to `quality_ratchet_baseline.json`. That is what is "allowed" today, and
+  nobody will complain to you about it.
+- ⬇️ **The count can only go down**: if you fix something old, the count drops. The tool asks you
+  to lock in the improvement (`update-baseline`) so nobody reuses the room that was freed.
+- 🚫 **New code must be clean**: any new violation, or an old file whose violations grew, fails the
+  check.
+- 🛡 **The baseline is never raised**: `update-baseline` never increases a number. And if someone
+  raises it by hand in a PR, the raise guard compares it with the baseline at the merge-base and
+  catches it.
 
-- 🧊 **الدين القديم بيتجمّد**: أول مرة بتشغّل `init`، الأداة بتعدّ المخالفات في كل فايل
-  وبتكتبها في `quality_ratchet_baseline.json`. ده «المسموح بيه» النهارده، ومحدش هيزعّقلك عليه.
-- ⬇️ **العدد يقدر ينزل بس**: لو صلّحت حاجة قديمة، العدد بينزل. الأداة بتطلب منك تثبّت التحسين
-  (`update-baseline`) عشان محدش يرجع يستخدم المساحة اللي فضيت.
-- 🚫 **الكود الجديد لازم يبقى نضيف**: أي مخالفة جديدة، أو فايل قديم زادت مخالفاته، الـ check بيفشل.
-- 🛡 **الـ baseline مش بيتعلّى**: `update-baseline` عمره ما بيزوّد رقم. ولو حد علّاه بإيده في
-  PR، الـ raise guard بيقارن بالـ baseline اللي في الـ merge-base وبيقفش ده.
+The result: the code improves with every PR, without a big-bang refactor.
 
-النتيجة: الكود بيتحسّن مع كل PR، من غير big-bang refactor.
+## 📦 Installation
 
-## 📦 التثبيت
-
-**عالمي (global):**
-
-</div>
+**Global:**
 
 ```bash
-dart pub global activate --source git https://github.com/youssef336/flutter_quality_ratchet
+dart pub global activate flutter_quality_ratchet
 quality_ratchet --help
 ```
 
-<div dir="rtl">
-
-**أو كـ dev_dependency جوه المشروع** (كل الفريق ياخد نفس النسخة):
-
-</div>
+**Or as a dev_dependency inside the project** (the whole team gets the same version):
 
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  flutter_quality_ratchet:
-    git:
-      url: https://github.com/youssef336/flutter_quality_ratchet
-      ref: v0.1.0
+  flutter_quality_ratchet: ^0.1.1
 ```
 
 ```bash
 dart run flutter_quality_ratchet check
 ```
 
-<div dir="rtl">
-
-## 🚀 أول مرة
-
-</div>
+## 🚀 First run
 
 ```bash
 cd my_flutter_app
@@ -89,28 +80,25 @@ quality_ratchet check       # لازم يطلع 0
 git add quality_ratchet.yaml quality_ratchet_baseline.json
 ```
 
-<div dir="rtl">
+`init` looks at `pubspec.yaml`: if the project is a Flutter project it adds the UI rules (text
+written in `Text(...)` and colors); if it is plain Dart it sticks to the general rules. The whole
+file is commented, so edit it freely.
 
-`init` بيبص على `pubspec.yaml`: لو المشروع Flutter بيضيف قواعد الـ UI (النصوص المكتوبة في
-`Text(...)` والألوان)، ولو Dart بس بيكتفي بالقواعد العامة. الملف كله متعلّق عليه، عدّل فيه براحتك.
+## ⌨️ Commands
 
-## ⌨️ الأوامر
-
-| الأمر | بيعمل إيه |
+| Command | What it does |
 |---|---|
-| `init [--force]` | بيكتب `quality_ratchet.yaml` بقيم معقولة، وبيعمل baseline بالأعداد الحالية |
-| `check [--base <ref>] [--rule id] [--format text\|github\|json]` | الفحص نفسه. بيفشل لو فيه جديد، أو زيادة، أو baseline قديم (stale)، أو baseline اتعلّى |
-| `update-baseline [--base <ref>] [--rule id]` | بينزّل الـ baseline للأعداد الحالية. **بينزّل بس**، عمره ما بيعلّي |
-| `seed-rule <id>` | لما تضيف قاعدة جديدة: بيكتب الـ section بتاعتها بس، ومش بيلمس الباقي |
-| `explain [--rule id]` | بيعرض كل قاعدة، إعداداتها، والـ baseline قدام العدد الحالي، وأكتر الفايلات |
+| `init [--force]` | Writes `quality_ratchet.yaml` with sensible values and creates a baseline from the current counts |
+| `check [--base <ref>] [--rule id] [--format text\|github\|json]` | The check itself. Fails if there is anything new, an increase, a stale baseline, or a raised baseline |
+| `update-baseline [--base <ref>] [--rule id]` | Lowers the baseline to the current counts. **Only lowers**, never raises |
+| `seed-rule <id>` | When you add a new rule: writes only that rule's section and leaves the rest untouched |
+| `explain [--rule id]` | Shows every rule, its settings, the baseline against the current count, and the top files |
 
-`-C <dir>` بيشغّلها على مشروع في فولدر تاني، و `--no-color` بيقفل الألوان.
+`-C <dir>` runs it on a project in another folder, and `--no-color` turns colors off.
 
-**الـ exit codes:** `0` نضيف · `1` فيه مخالفات · `2` غلط في الأمر أو الإعدادات أو الـ baseline مش موجود.
+**Exit codes:** `0` clean · `1` violations · `2` command or config error, or the baseline is missing.
 
-**شكل الـ output:**
-
-</div>
+**Output looks like this:**
 
 ```text
 quality_ratchet check · 158 file(s) scanned
@@ -130,11 +118,7 @@ FAILED: 1 error(s).
   Fix the reported lines. The baseline only covers old debt: new and changed code must be clean.
 ```
 
-<div dir="rtl">
-
-## ⚙️ ملف الإعدادات `quality_ratchet.yaml`
-
-</div>
+## ⚙️ The config file `quality_ratchet.yaml`
 
 ```yaml
 include:                 # الافتراضي: lib/**/*.dart
@@ -155,14 +139,11 @@ rules:
     fail_above: 500
 ```
 
-<div dir="rtl">
+**Globs:** `*` (no `/`), `**/` (any number of folders), `{a,b}`, `[abc]`. A glob without a `/`
+matches at any depth (`*.g.dart`), and one ending in `/` means "everything inside this folder"
+(`generated/`).
 
-**الـ globs:** `*` (من غير `/`)، `**/` (أي عدد فولدرات)، `{a,b}`، `[abc]`. الـ glob اللي
-مفيهوش `/` بيطابق في أي عمق (`*.g.dart`)، واللي آخره `/` معناه «كل اللي جوه الفولدر ده» (`generated/`).
-
-### 📏 `max_file_lines`: حجم الفايل
-
-</div>
+### 📏 `max_file_lines`: file size
 
 ```yaml
 - id: file_size
@@ -173,14 +154,10 @@ rules:
   message: Split this file into smaller files.
 ```
 
-<div dir="rtl">
+An old large file can only shrink, never grow. "Lines" are what the editor numbers (like `wc -l`
+for any file that ends with an empty line).
 
-الفايل الكبير القديم يقدر يصغر بس، عمره ما يكبر. «السطور» هي اللي الـ editor بيرقّمها
-(زي `wc -l` لأي فايل آخره سطر فاضي).
-
-### 🧩 `max_function_lines`: طول الـ function
-
-</div>
+### 🧩 `max_function_lines`: function length
 
 ```yaml
 - id: long_functions
@@ -189,15 +166,11 @@ rules:
   message: Extract smaller functions or widgets.
 ```
 
-<div dir="rtl">
+It measures named functions, methods, constructors and getters with a `{ }` body (from the line
+with the name to the closing brace). The baseline stores the line count, so a long `build` can only
+get shorter.
 
-بيقيس الـ functions والـ methods والـ constructors والـ getters اللي ليها اسم وجسمها `{ }`
-(من سطر الاسم لحد القوس اللي بيقفل). الـ baseline بيحفظ عدد السطور، فالـ `build` الطويلة
-تقدر تقصر بس.
-
-### 🧱 `forbidden_imports`: حدود الطبقات
-
-</div>
+### 🧱 `forbidden_imports`: layer boundaries
 
 ```yaml
 - id: no_core_to_features
@@ -211,15 +184,11 @@ rules:
   message: lib/core must not import lib/features.
 ```
 
-<div dir="rtl">
+It understands relative imports (`../features/x.dart`) and `package:<your project name>/...` (it
+reads the name from `pubspec.yaml`), exports, and conditional imports. The glob is matched against
+the resolved path and against the URI itself, so `dart:io` and `package:get/**` work.
 
-بيفهم الـ imports النسبية (`../features/x.dart`) و `package:<اسم مشروعك>/...` (بيقرا الاسم من
-`pubspec.yaml`)، والـ exports، والـ conditional imports. الـ glob بيتطابق على المسار بعد الـ
-resolve وعلى الـ URI نفسه، فـ `dart:io` و `package:get/**` شغالين.
-
-### 🔍 `forbidden_patterns`: أنماط ممنوعة
-
-</div>
+### 🔍 `forbidden_patterns`: forbidden patterns
 
 ```yaml
 - id: no_set_state
@@ -244,15 +213,11 @@ resolve وعلى الـ URI نفسه، فـ `dart:io` و `package:get/**` شغا
   message: Use the shared AppButton.
 ```
 
-<div dir="rtl">
+The regex runs on **code only**: comments and string text are stripped first, so `// setState(` or
+`'setState('` are not counted. But whatever is inside `${...}` is code, so it is counted. Write the
+regex between `'...'` in the YAML so the `\` stays as it is.
 
-الـ regex بيشتغل على **الكود بس**: التعليقات ونصوص الـ strings بتتمسح الأول، فـ
-`// setState(` أو `'setState('` مش هيتحسبوا. بس اللي جوه `${...}` كود، فبيتحسب.
-اكتب الـ regex بين `'...'` في الـ YAML عشان الـ `\` يفضل زي ما هو.
-
-### 💬 `hardcoded_strings`: نصوص مكتوبة في الـ UI
-
-</div>
+### 💬 `hardcoded_strings`: text written in the UI
 
 ```yaml
 - id: hardcoded_ui_strings
@@ -264,30 +229,27 @@ resolve وعلى الـ URI نفسه، فـ `dart:io` و `package:get/**` شغا
   message: Move this text to your translation files.
 ```
 
-<div dir="rtl">
+It catches a string literal that is **passed directly**: `Text('Welcome')` and `hintText: 'Email'`.
+It does not catch `Text('key'.tr())`, `Text(label)` or `Text('a' + b)`, nor strings that contain no
+letter at all (`'-'`, `'42 %'`, `'$count'`). Arabic letters count as normal letters.
 
-بيمسك الـ string literal اللي **متباصي على طول**: `Text('Welcome')` و `hintText: 'Email'`.
-ومش بيمسك `Text('key'.tr())` ولا `Text(label)` ولا `Text('a' + b)`، ولا النصوص اللي مفيهاش
-ولا حرف (`'-'`، `'42 %'`، `'$count'`). الحروف العربي بتتحسب حروف عادي.
+## 🧮 The ratchet rules in detail
 
-## 🧮 قواعد الـ ratchet بالتفصيل
-
-| الحالة | النتيجة |
+| Case | Result |
 |---|---|
-| العدد في فايل = الـ baseline | ✅ تمام |
-| العدد زاد في فايل موجود في الـ baseline | ❌ error |
-| فايل مش في الـ baseline وفيه مخالفات | ❌ error لكل مخالفة (إلا لو «نقل»، تحت) |
-| العدد نزل | ❌ error «stale»: شغّل `update-baseline` وثبّت التحسين |
-| **نقل (move)**: مخالفات في فايل جديد، ومجموع القاعدة ما زادش | ℹ️ مسموح (split أو rename مش دين جديد) |
-| نقل لفايل كان موجود في الـ merge-base | ❌ ده مقايضة: صلّحت هنا وزوّدت هناك |
-| `--base`: entry أعلى من الـ merge-base | ❌ error، أو ⚠️ warning لو معاه `reason` |
-| `--base`: entry جديد ومجموع القاعدة زاد | ❌ error (أو ⚠️ مع `reason`) |
+| The count in a file = the baseline | ✅ fine |
+| The count grew in a file that is in the baseline | ❌ error |
+| A file not in the baseline has violations | ❌ an error per violation (unless it is a "move", below) |
+| The count went down | ❌ "stale" error: run `update-baseline` and lock in the improvement |
+| **Move**: violations in a new file, and the rule's total did not grow | ℹ️ allowed (a split or rename is not new debt) |
+| A move into a file that already existed at the merge-base | ❌ that is a trade: you fixed here and added there |
+| `--base`: an entry higher than at the merge-base | ❌ error, or ⚠️ warning if it has a `reason` |
+| `--base`: a new entry and the rule's total grew | ❌ error (or ⚠️ with a `reason`) |
 
-ليه الـ stale بيفشل؟ عشان لو ما ثبّتّش التحسين، أول PR بعدك يقدر يرجّع نفس العدد من غير ما حد يحس.
+Why does stale fail? Because if you don't lock in the improvement, the first PR after yours can
+bring the same count back without anyone noticing.
 
 ## 🤖 GitHub Action
-
-</div>
 
 ```yaml
 # .github/workflows/quality.yml
@@ -309,20 +271,16 @@ jobs:
         #   version: v0.1.0                 # الافتراضي: نفس نسخة الـ action
 ```
 
-<div dir="rtl">
+The action installs Dart, activates the tool from the same ref as the action, and runs
+`check --format github --base <base-ref>`. Violations show up as annotations on the PR lines, and
+the rules table shows up in the job summary. On a push (no base) it runs without `--base`.
 
-الـ action بيسطّب Dart، وبيفعّل الأداة من نفس الـ ref بتاع الـ action، وبيشغّل
-`check --format github --base <base-ref>`. المخالفات بتظهر annotations على سطور الـ PR،
-وجدول الـ rules بيظهر في الـ job summary. في الـ push (من غير base) بيشتغل من غير `--base`.
-
-## ❓ أسئلة
+## ❓ FAQ
 
 <details>
-<summary><b>لازم أعمل استثناء مستعجل (hotfix) ومش وقت تنضيف. أعمل إيه؟</b></summary>
+<summary><b>I need an urgent exception (hotfix) and there is no time to clean up. What do I do?</b></summary>
 
-علّي الـ entry بإيدك في نفس الـ PR، واكتب السبب:
-
-</div>
+Raise the entry by hand in the same PR, and write the reason:
 
 ```json
 "no_print": {
@@ -330,57 +288,54 @@ jobs:
 }
 ```
 
-<div dir="rtl">
-
-الـ check هيعدّي، بس الـ raise guard هيطلّع **warning** فيه السبب على الـ PR، فالـ reviewer
-شايفه وبيوافق عليه عن قصد. من غير `reason` الرفع ده error. وأول ما العدد ينزل تاني،
-`update-baseline` بيشيل الـ reason لوحده.
+The check will pass, but the raise guard will emit a **warning** with the reason on the PR, so the
+reviewer sees it and approves it deliberately. Without a `reason` this raise is an error. As soon as
+the count goes down again, `update-baseline` removes the reason by itself.
 
 </details>
 
 <details>
-<summary><b>قسمت فايل كبير لتلات فايلات، والـ check بيقول new path؟</b></summary>
+<summary><b>I split a large file into three files, and the check says new path?</b></summary>
 
-لو مجموع القاعدة ما زادش والفايلات جديدة، ده «نقل» ومسموح (notice). شغّل
-`update-baseline` عشان يسجّل المسارات الجديدة ويشيل القديم.
-
-</details>
-
-<details>
-<summary><b>ضفت قاعدة جديدة للإعدادات، والـ check بيطلع exit 2؟</b></summary>
-
-عادي: القاعدة ملهاش section في الـ baseline. شغّل `quality_ratchet seed-rule <id>` مرة واحدة،
-وده بيجمّد الدين الحالي للقاعدة دي بس. ولو شلت قاعدة، `update-baseline` بيشيل الـ section بتاعتها.
+If the rule's total did not grow and the files are new, that is a "move" and it is allowed (notice).
+Run `update-baseline` so it records the new paths and drops the old one.
 
 </details>
 
 <details>
-<summary><b>ممكن أشغّلها من غير --base؟</b></summary>
+<summary><b>I added a new rule to the config, and the check exits with 2?</b></summary>
 
-أيوه، كل حاجة شغالة. اللي بيقف: الـ raise guard، وتحذير الفايلات الجديدة، والتأكد إن «النقل»
-لفايل جديد فعلًا. في الـ CI استخدم `--base` دايمًا.
+That is normal: the rule has no section in the baseline. Run `quality_ratchet seed-rule <id>` once,
+and that freezes the current debt for that rule only. And if you remove a rule, `update-baseline`
+removes its section.
 
 </details>
 
 <details>
-<summary><b>monorepo؟</b></summary>
+<summary><b>Can I run it without --base?</b></summary>
 
-حط `quality_ratchet.yaml` في فولدر المشروع، وشغّل `quality_ratchet -C app check` أو
-`working-directory: app` في الـ action. الـ git commands بتشتغل نسبةً للفولدر ده.
+Yes, everything works. What stops working: the raise guard, the new-file warnings, and the check
+that a "move" really goes to a new file. In CI, always use `--base`.
 
 </details>
 
-## ⚖️ الحدود
+<details>
+<summary><b>Monorepo?</b></summary>
 
-- مش parser كامل لـ Dart: lexer صغير بيفرّق الكود عن التعليقات والـ strings. ده كفاية
-  للقواعد دي، بس `max_function_lines` heuristic: مش بيقيس الـ closures ولا `=>`،
-  ومش بيقيس constructor عنده initializer list قبل الـ `{`.
-- `hardcoded_strings` بيمسك الـ literal المتباصي مباشرة بس، مش اللي في متغير الأول.
-- الـ regex في `forbidden_patterns` بيشوف الكود بس؛ مينفعش تدوّر بيه جوه نص string.
-- الـ raise guard بيحرس الـ baseline، مش ملف الإعدادات: لو حد خفّف `fail_above` أو شال قاعدة،
-  ده بيبان في الـ diff بتاع `quality_ratchet.yaml` في الـ review.
+Put `quality_ratchet.yaml` in the project folder, and run `quality_ratchet -C app check`, or use
+`working-directory: app` in the action. The git commands run relative to that folder.
 
-</div>
+</details>
+
+## ⚖️ Limitations
+
+- It is not a full Dart parser: a small lexer separates code from comments and strings. That is
+  enough for these rules, but `max_function_lines` is a heuristic: it does not measure closures or
+  `=>`, and it does not measure a constructor that has an initializer list before the `{`.
+- `hardcoded_strings` only catches a literal passed directly, not one stored in a variable first.
+- The regex in `forbidden_patterns` only sees code; you cannot use it to search inside string text.
+- The raise guard protects the baseline, not the config file: if someone loosens `fail_above` or
+  removes a rule, that shows up in the `quality_ratchet.yaml` diff during review.
 
 ## 🛠 Tech stack
 
