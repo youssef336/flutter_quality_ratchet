@@ -1,5 +1,7 @@
 [العربية](README.ar.md)
 
+<p align="center"><img src="https://raw.githubusercontent.com/youssef336/flutter_quality_ratchet/main/screenshots/banner.png" alt="flutter_quality_ratchet banner" width="100%"></p>
+
 <h1 align="center">Flutter Quality Ratchet</h1>
 
 <p align="center">
